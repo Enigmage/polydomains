@@ -7,7 +7,13 @@ const DomainsModule = buildModule("DomainsModule", m => {
   const domains = m.contract("Domains");
 
   const register = m.call(domains, "register", ["doom"]);
-  m.call(domains, "getAddress", ["doom"], { after: [register] });
+
+  const record = m.call(domains, "setRecord", [
+    "doom",
+    "https://github.com/Enigmage",
+  ]);
+
+  m.call(domains, "getRecord", ["doom"], { after: [register, record] });
 
   return { domains };
 });
