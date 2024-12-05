@@ -40,7 +40,7 @@ contract Domains is ERC721URIStorage {
         uint len = StringUtils.strlen(name);
         require(len > 0);
         if (len == 3) {
-            return 5 * 10 ** 17; // 0.5 MATIC
+            return 5 * 10 ** 17; // 0.5 ETH
         } else if (len == 4) {
             return 3 * 10 ** 17;
         } else {
