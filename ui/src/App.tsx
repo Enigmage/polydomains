@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import './styles/App.css';
 import {ethers} from "ethers";
 
-import contractAbi from './utils/contractABI.json';
+import contractAbi from './contracts/Domains.sol/Domains.json';
 
-const tld = '.ninja';
-const CONTRACT_ADDRESS = 'YOUR_CONTRACT_ADDRESS_HERE';
+const tld = '.scholar';
+const CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 
 const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState('');
@@ -71,31 +71,31 @@ const App: React.FC = () => {
     try {
       const { ethereum } = window;
       if (ethereum) {
-        // const provider = new ethers.BrowserProvider(ethereum);
-        // const signer = await provider.getSigner();
-        // const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
   
-        // console.log("Going to pop wallet now to pay gas...")
-        // let tx = await contract.register(domain, {value: ethers.parseEther(price)});
-        // // Wait for the transaction to be mined
-        // const receipt = await tx.wait();
+        console.log("Going to pop wallet now to pay gas...")
+        let tx = await contract.registerDomain(domain, {value: ethers.parseEther(price)});
+        // Wait for the transaction to be mined
+        const receipt = await tx.wait();
   
-        // // Check if the transaction was successfully completed
-        // if (receipt.status === 1) {
-        //   console.log("Domain minted! https://mumbai.polygonscan.com/tx/"+tx.hash);
+        // Check if the transaction was successfully completed
+        if (receipt.status === 1) {
+          console.log("Domain minted! localhost/"+tx.hash);
           
-        //   // Set the record for the domain
-        //   tx = await contract.setRecord(domain, record);
-        //   await tx.wait();
+          // Set the record for the domain
+          tx = await contract.setRecord(domain, record);
+          await tx.wait();
   
-        //   console.log("Record set! https://mumbai.polygonscan.com/tx/"+tx.hash);
+          console.log("Record set! localhost/"+tx.hash);
           
-        //   setRecord('');
-        //   setDomain('');
-        // }
-        // else {
-        //   alert("Transaction failed! Please try again");
-        // }
+          setRecord('');
+          setDomain('');
+        }
+        else {
+          alert("Transaction failed! Please try again");
+        }
       }
     }
     catch(error){
@@ -129,7 +129,7 @@ const App: React.FC = () => {
 				<input
 					type="text"
 					value={record}
-					placeholder='whats ur ninja power'
+					placeholder='enter record'
 					onChange={e => setRecord(e.target.value)}
 				/>
 
