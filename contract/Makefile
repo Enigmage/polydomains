@@ -1,6 +1,6 @@
 .PHONY: test compile
 
 test:
-	npx hardhat test
+	REPORT_GAS=true npx hardhat test
 compile:
 	npx hardhat compile 
