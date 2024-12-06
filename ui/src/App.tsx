@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import './styles/App.css';
 import {ethers} from "ethers";
 
 import contractAbi from './contracts/Domains.sol/Domains.json';
 
 const tld = '.scholar';
-const CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const CONTRACT_ADDRESS = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
 
 const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState('');
   const [domain, setDomain] = useState('');
-  const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState('');
+  const navigate = useNavigate();
 
   const connectWallet = async () => { 
     try {
@@ -163,6 +164,11 @@ const App: React.FC = () => {
         {/* Render the input form if an account is connected */}
 				{currentAccount && renderInputForm()}
         <div className="footer-container">
+        <div className="button-container">
+					<button className='cta-button mint-button' onClick={()=>{navigate("/resolve")}}>
+						Resolve Domain
+					</button>
+				</div>
         </div>
       </div>
     </div>
