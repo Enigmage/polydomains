@@ -1,6 +1,6 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 
-import registerRouter from "./routes/register";
+import routes from "./routes";
 import { swaggerUI } from "@hono/swagger-ui";
 
 const PORT = process.env.PORT || 8080;
@@ -28,7 +28,7 @@ app.doc("/docs", {
 });
 
 app.get("/swagger", swaggerUI({ url: "/docs" }));
-app.route("/domains", registerRouter);
+app.route("/domains", routes);
 
 export default {
   port: PORT,

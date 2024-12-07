@@ -225,4 +225,22 @@ describe("Domains Contract Tests", () => {
 
     expect(contractBalance).to.equal(0n);
   });
+  it("should return all domains owned by a user", async () => {
+    // Register an additional domain for deployer
+    const additionalDomain = "example";
+    const txn = await domain
+      .connect(deployer)
+      .registerDomain(additionalDomain, {
+        value: hre.ethers.parseEther("0.1"),
+      });
+    await txn.wait();
+
+    // Get domains for the deployer
+    const ownedDomains = await domain.getDomainsForUser(deployer.address);
+
+    console.log(ownedDomains);
+
+    // Verify domains
+    expect(ownedDomains).to.deep.equal([sampleDomain, additionalDomain]);
+  });
 });

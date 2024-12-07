@@ -46,6 +46,7 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
     mapping(string => string) public records;
     mapping(uint => string) public names;
     mapping(string => Rental) public domainRentals;
+    mapping(address => string[]) private userDomains;
 
     uint256 public constant MINIMUM_RENTAL_DURATION = 1 days;
     uint256 public constant MAXIMUM_RENTAL_DURATION = 365 days;
@@ -141,6 +142,7 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
         _safeMint(msg.sender, newRecordId);
         _setTokenURI(newRecordId, finalTokenUri);
         domains[name] = msg.sender;
+        userDomains[msg.sender].push(name);
         names[newRecordId] = name;
 
         _tokenIdCounter++;
@@ -202,7 +204,10 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
         Rental memory currentRental = domainRentals[name];
 
         // Cannot transfer if domain is currently rented
-        if (currentRental.endTime > block.timestamp) revert Unauthorized();
+        if (
+            currentRental.renter != address(0) &&
+            currentRental.endTime > block.timestamp
+        ) revert Unauthorized();
         if (domains[name] != msg.sender) revert Unauthorized();
         require(to != address(0), "Cannot transfer to the zero address");
 
@@ -219,6 +224,8 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
         _transfer(msg.sender, to, tokenId);
 
         domains[name] = to;
+        userDomains[to].push(name);
+        _removeDomainFromUser(msg.sender, name);
         emit DomainTransferred(name, previousOwner, to);
         console.log(
             "Domain %s transferred from %s to %s",
@@ -232,30 +239,26 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
         string calldata name,
         uint256 rentalDays
     ) public payable nonReentrant {
-        // Validate rental duration
         if (rentalDays < 1 || rentalDays > 365) revert InvalidRentalDuration();
 
-        // Check if domain exists and is owned
         address domainOwner = domains[name];
         if (domainOwner == address(0)) revert InvalidName(name);
 
-        // Check if domain is already rented
         Rental memory currentRental = domainRentals[name];
-        if (currentRental.endTime > block.timestamp)
-            revert RentalNotAvailable();
+        if (
+            currentRental.renter != address(0) &&
+            currentRental.endTime > block.timestamp
+        ) revert RentalNotAvailable();
 
-        // Calculate total rental cost
         uint256 totalRentalCost = rentalDays * RENTAL_PRICE_PER_DAY;
         if (msg.value < totalRentalCost)
             revert InsufficientPayment(totalRentalCost, msg.value);
 
-        // Create rental
         domainRentals[name] = Rental({
             renter: msg.sender,
             endTime: block.timestamp + (rentalDays * 1 days)
         });
 
-        // Emit rental event
         emit DomainRented(
             name,
             msg.sender,
@@ -263,7 +266,6 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
             block.timestamp + (rentalDays * 1 days)
         );
 
-        // Refund excess payment
         if (msg.value > totalRentalCost) {
             payable(msg.sender).transfer(msg.value - totalRentalCost);
         }
@@ -272,17 +274,13 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
     function cancelRental(string calldata name) public nonReentrant {
         Rental storage currentRental = domainRentals[name];
 
-        // Ensure the caller is the current renter
         if (currentRental.renter != msg.sender) revert Unauthorized();
 
-        // Ensure rental is active
         if (currentRental.endTime <= block.timestamp)
             revert RentalNotAvailable();
 
-        // Emit cancellation event
         emit RentalCanceled(name, msg.sender);
 
-        // Clear the rental
         delete domainRentals[name];
     }
 
@@ -301,5 +299,27 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
     ) public view returns (address renter, uint256 endTime) {
         Rental memory currentRental = domainRentals[name];
         return (currentRental.renter, currentRental.endTime);
+    }
+
+    function getDomainsForUser(
+        address user
+    ) external view returns (string[] memory) {
+        return userDomains[user];
+    }
+
+    function _removeDomainFromUser(address user, string memory name) internal {
+        string[] storage domainsList = userDomains[user];
+        for (uint256 i = 0; i < domainsList.length; i++) {
+            if (
+                keccak256(abi.encodePacked(domainsList[i])) ==
+                keccak256(abi.encodePacked(name))
+            ) {
+                // Replace the removed domain with the last element
+                domainsList[i] = domainsList[domainsList.length - 1];
+                // Remove the last element
+                domainsList.pop();
+                break;
+            }
+        }
     }
 }
