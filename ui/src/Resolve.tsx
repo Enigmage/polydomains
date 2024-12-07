@@ -69,7 +69,7 @@ const Resolve: React.FC = () => {
           <header>
               <div className="left">
                 <p className="title">PolyDomains</p>
-                <p className="subtitle">ENS on Polygon</p>
+                <p className="subtitle">SNS on Hardhat</p>
               </div>
           </header>
         </div>
