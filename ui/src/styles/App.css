@@ -295,3 +295,31 @@ input:focus {
     background-position: 0% 50%;
   }
 }
+
+.output-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 150px); /* Adjust height to exclude header */
+  flex-direction: column;
+  text-align: center;
+  padding: 20px;
+  background-color: #181818;
+}
+
+.output-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.output-container li {
+  font-size: 24px; /* Larger text */
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #a200d6;
+  color: white;
+  box-shadow: 0px 0px 10px 3px rgba(255, 255, 255, 0.2);
+  width: 300px;
+  text-align: center;
+}
