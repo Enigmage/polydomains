@@ -3,10 +3,11 @@ import { ethers } from "ethers";
 import Domains from "../../contract/artifacts/contracts/Domains.sol/Domains.json";
 
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
-const contractAddr = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const contractAddr = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
 
 const walletPrivateKey =
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+const walletPrivateKey2 = "0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba";
 const wallet = new ethers.Wallet(walletPrivateKey, provider);
 // const contractABI = [
 //   "function registerDomain(string name) public payable",
