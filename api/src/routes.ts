@@ -535,71 +535,71 @@ app.openapi(getDomainsRoute, async c => {
   }
 });
 
-const BuyDomainRequestSchema = z.object({
-  name: z.string(),
-  ether: z.string(),
-});
-
-const BuyDomainResponseSchema = z.object({
-  message: z.string(),
-  txnHash: z.string(),
-});
-
-const buyRentedDomainRoute = createRoute({
-  method: "post",
-  path: "/buy-rented-domain",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: BuyDomainRequestSchema,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: BuyDomainResponseSchema,
-        },
-      },
-      description: "Domain purchased successfully",
-    },
-    400: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description: "Failed to purchase domain",
-    },
-  },
-  tags: ["Domains"],
-});
-
-app.openapi(buyRentedDomainRoute, async c => {
-  const { name, ether } = c.req.valid("json");
-
-  // Convert the ether string to a BigNumber value
-  const purchasePrice = ethers.parseEther(ether.toString());
-
-  try {
-    // Call the smart contract's function to buy the rented domain
-    const tx = await contract.buyRentedDomain(name, { value: purchasePrice });
-    await tx.wait();
-
-    // Returning the successful response
-    return c.json(
-      {
-        message: "Domain purchased successfully",
-        txnHash: tx.hash,
-      },
-      200,
-    );
-  } catch (err) {
-    // Handle any errors and return a 400 status
-    return c.json({ message: err }, 400);
-  }
-});
+// const BuyDomainRequestSchema = z.object({
+//   name: z.string(),
+//   ether: z.string(),
+// });
+//
+// const BuyDomainResponseSchema = z.object({
+//   message: z.string(),
+//   txnHash: z.string(),
+// });
+//
+// const buyRentedDomainRoute = createRoute({
+//   method: "post",
+//   path: "/buy-rented-domain",
+//   request: {
+//     body: {
+//       content: {
+//         "application/json": {
+//           schema: BuyDomainRequestSchema,
+//         },
+//       },
+//     },
+//   },
+//   responses: {
+//     200: {
+//       content: {
+//         "application/json": {
+//           schema: BuyDomainResponseSchema,
+//         },
+//       },
+//       description: "Domain purchased successfully",
+//     },
+//     400: {
+//       content: {
+//         "application/json": {
+//           schema: ErrorSchema,
+//         },
+//       },
+//       description: "Failed to purchase domain",
+//     },
+//   },
+//   tags: ["Domains"],
+// });
+//
+// app.openapi(buyRentedDomainRoute, async c => {
+//   const { name, ether } = c.req.valid("json");
+//
+//   // Convert the ether string to a BigNumber value
+//   const purchasePrice = ethers.parseEther(ether.toString());
+//
+//   try {
+//     // Call the smart contract's function to buy the rented domain
+//     const tx = await contract.buyRentedDomain(name, { value: purchasePrice });
+//     await tx.wait();
+//
+//     // Returning the successful response
+//     return c.json(
+//       {
+//         message: "Domain purchased successfully",
+//         txnHash: tx.hash,
+//       },
+//       200,
+//     );
+//   } catch (err) {
+//     // Handle any errors and return a 400 status
+//     return c.json({ message: err }, 400);
+//   }
+// });
 export default app;

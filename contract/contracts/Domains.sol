@@ -328,42 +328,4 @@ contract Domains is ERC721URIStorage, ReentrancyGuard {
             }
         }
     }
-
-    function buyRentedDomain(string calldata name) public payable nonReentrant {
-        Rental memory currentRental = domainRentals[name];
-        address currentDomainOwner = domains[name];
-
-        require(
-            currentRental.renter != address(0) &&
-                currentRental.endTime > block.timestamp,
-            "Domain is not currently rented"
-        );
-
-        require(msg.sender != currentDomainOwner, "Cannot buy your own domain");
-
-        uint256 purchasePrice = 2 *
-            (RENTAL_PRICE_PER_DAY *
-                ((currentRental.endTime - block.timestamp) / 1 days));
-        require(
-            msg.value >= purchasePrice,
-            "Insufficient payment for domain purchase"
-        );
-
-        payable(currentDomainOwner).transfer(purchasePrice);
-
-        delete domainRentals[name];
-
-        transferDomain(name, msg.sender);
-
-        if (msg.value > purchasePrice) {
-            payable(msg.sender).transfer(msg.value - purchasePrice);
-        }
-
-        emit DomainPurchased(
-            name,
-            currentDomainOwner,
-            msg.sender,
-            purchasePrice
-        );
-    }
 }
