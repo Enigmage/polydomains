@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import './styles/App.css';
 import {ethers} from "ethers";
-
+import {contractAddr as CONTRACT_ADDRESS} from './config';
 import contractAbi from './contracts/Domains.sol/Domains.json';
 
 const tld = '.scholar';
-const CONTRACT_ADDRESS = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
 
 const Resolve: React.FC = () => {
   const [domain, setDomain] = useState('');
@@ -24,12 +23,13 @@ const Resolve: React.FC = () => {
         const provider = new ethers.BrowserProvider(ethereum);
         const signer = await provider.getSigner();
         const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
-
-        let record: any = await contract.getRecord(domain);
+        let record;
+        record = await contract.getRecord(domain);
         console.log(record);
-
         if(record){
-            window.open(record, '_blank');
+          window.open(record, '_blank');
+        } else {
+          alert("Domain not registered!");
         }
 
       }
