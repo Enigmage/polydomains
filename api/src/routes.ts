@@ -457,4 +457,82 @@ app.openapi(rentalDetailsRoute, async c => {
   }
 });
 
+const getDomainsRoute = createRoute({
+  method: "get", // Use GET for retrieving data
+  path: "/:address", // Define the address as a route parameter
+  request: {
+    params: z.object({
+      address: z
+        .string()
+        .openapi({ example: "0x123...456" })
+        .describe("The Ethereum address of the user"),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: ResponseSchema.extend({
+            address: z.string().openapi({ example: "0x123...456" }),
+            domains: z.array(z.string()).openapi({
+              example: ["domain1", "domain2", "domain3"],
+            }),
+          }),
+        },
+      },
+      description: "Domains retrieved successfully",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Invalid Ethereum address",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No domains found for the provided address",
+    },
+  },
+  tags: ["Domains"],
+});
+
+app.openapi(getDomainsRoute, async c => {
+  const address = c.req.param("address"); // Fetch address from route params
+  console.log("Address: ", address);
+  try {
+    // // Validate Ethereum address
+    // if (!ethers.isAddress(address)) {
+    //   return c.json({ code: 400, message: "Invalid Ethereum address" }, 400);
+    // }
+
+    const domains: string[] = await contract.getDomainsForUser(address);
+
+    if (domains.length === 0) {
+      return c.json(
+        { code: 404, message: "No domains found for the provided address" },
+        404,
+      );
+    }
+
+    return c.json(
+      {
+        message: "Domains retrieved successfully",
+        address,
+        domains,
+        txnHash: "",
+      },
+      200,
+    );
+  } catch (err) {
+    console.log(err);
+    return c.json({ code: 400, message: "Failed to retrieve domains" }, 400);
+  }
+});
+
 export default app;
