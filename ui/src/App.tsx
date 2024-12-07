@@ -171,6 +171,12 @@ const App: React.FC = () => {
               Resolve Domain
             </button>
           </div>}
+          {currentAccount && 
+          <div className="button-container">
+            <button className='cta-button mint-button' onClick={()=>{navigate("/list")}}>
+              List Domains
+            </button>
+          </div>}
         </div>
       </div>
     </div>
