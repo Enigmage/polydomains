@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './styles/App.css';
 import {ethers} from "ethers";
-import {contractAddr as CONTRACT_ADDRESS} from './config';
+import { CONTRACT_ADDRESS } from "./config";
 import contractAbi from './contracts/Domains.sol/Domains.json';
 
 const tld = '.scholar';
