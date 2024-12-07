@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './styles/App.css';
 import {ethers} from "ethers";
-import {contractAddr as CONTRACT_ADDRESS} from './config';
+import { CONTRACT_ADDRESS } from "./config";
 import contractAbi from './contracts/Domains.sol/Domains.json';
 
 const tld = '.scholar';
