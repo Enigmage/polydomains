@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './styles/App.css';
 import {ethers} from "ethers";
-
+import {contractAddr as CONTRACT_ADDRESS} from './config';
 import contractAbi from './contracts/Domains.sol/Domains.json';
 
 const tld = '.scholar';
-const CONTRACT_ADDRESS = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
 
 const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState('');
@@ -75,7 +74,9 @@ const App: React.FC = () => {
         const provider = new ethers.BrowserProvider(ethereum);
         const signer = await provider.getSigner();
         const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
-  
+        const blockNumber = await provider.getBlockNumber();
+        console.log(`Current block number: ${blockNumber}`);
+
         console.log("Going to pop wallet now to pay gas...")
         let tx = await contract.registerDomain(domain, {value: ethers.parseEther(price)});
         // Wait for the transaction to be mined
@@ -164,11 +165,12 @@ const App: React.FC = () => {
         {/* Render the input form if an account is connected */}
 				{currentAccount && renderInputForm()}
         <div className="footer-container">
-        <div className="button-container">
-					<button className='cta-button mint-button' onClick={()=>{navigate("/resolve")}}>
-						Resolve Domain
-					</button>
-				</div>
+        {currentAccount && 
+          <div className="button-container">
+            <button className='cta-button mint-button' onClick={()=>{navigate("/resolve")}}>
+              Resolve Domain
+            </button>
+          </div>}
         </div>
       </div>
     </div>
