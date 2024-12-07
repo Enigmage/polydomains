@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import './styles/App.css';
 import {ethers} from "ethers";
 
-import contractAbi from './utils/contractABI.json';
+import contractAbi from './contracts/Domains.sol/Domains.json';
 
-const tld = '.ninja';
-const CONTRACT_ADDRESS = 'YOUR_CONTRACT_ADDRESS_HERE';
+const tld = '.scholar';
+const CONTRACT_ADDRESS = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
 
 const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState('');
   const [domain, setDomain] = useState('');
-  const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState('');
+  const navigate = useNavigate();
 
   const connectWallet = async () => { 
     try {
@@ -71,31 +72,31 @@ const App: React.FC = () => {
     try {
       const { ethereum } = window;
       if (ethereum) {
-        // const provider = new ethers.BrowserProvider(ethereum);
-        // const signer = await provider.getSigner();
-        // const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
   
-        // console.log("Going to pop wallet now to pay gas...")
-        // let tx = await contract.register(domain, {value: ethers.parseEther(price)});
-        // // Wait for the transaction to be mined
-        // const receipt = await tx.wait();
+        console.log("Going to pop wallet now to pay gas...")
+        let tx = await contract.registerDomain(domain, {value: ethers.parseEther(price)});
+        // Wait for the transaction to be mined
+        const receipt = await tx.wait();
   
-        // // Check if the transaction was successfully completed
-        // if (receipt.status === 1) {
-        //   console.log("Domain minted! https://mumbai.polygonscan.com/tx/"+tx.hash);
+        // Check if the transaction was successfully completed
+        if (receipt.status === 1) {
+          console.log("Domain minted! localhost/"+tx.hash);
           
-        //   // Set the record for the domain
-        //   tx = await contract.setRecord(domain, record);
-        //   await tx.wait();
+          // Set the record for the domain
+          tx = await contract.setRecord(domain, record);
+          await tx.wait();
   
-        //   console.log("Record set! https://mumbai.polygonscan.com/tx/"+tx.hash);
+          console.log("Record set! localhost/"+tx.hash);
           
-        //   setRecord('');
-        //   setDomain('');
-        // }
-        // else {
-        //   alert("Transaction failed! Please try again");
-        // }
+          setRecord('');
+          setDomain('');
+        }
+        else {
+          alert("Transaction failed! Please try again");
+        }
       }
     }
     catch(error){
@@ -129,7 +130,7 @@ const App: React.FC = () => {
 				<input
 					type="text"
 					value={record}
-					placeholder='whats ur ninja power'
+					placeholder='enter record'
 					onChange={e => setRecord(e.target.value)}
 				/>
 
@@ -163,6 +164,11 @@ const App: React.FC = () => {
         {/* Render the input form if an account is connected */}
 				{currentAccount && renderInputForm()}
         <div className="footer-container">
+        <div className="button-container">
+					<button className='cta-button mint-button' onClick={()=>{navigate("/resolve")}}>
+						Resolve Domain
+					</button>
+				</div>
         </div>
       </div>
     </div>
